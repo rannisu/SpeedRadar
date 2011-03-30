@@ -1,0 +1,15 @@
+lib
+build
+Classes
+Resources
+headers
+Info.plist
+Info.plist.template
+main.m
+README
+Snapost_Prefix.pch
+Snapost.xcodeproj
+*
+
+!.
+!..
