@@ -9,6 +9,10 @@ var win_height=Titanium.Platform.displayCaps.platformHeight;
 var viewContainerHEIGHT=(Ti.Platform.osname!='android')?win_height*(3/4):win_height*(4/5);
 Ti.API.info('Ti.Platform.osname:\t'+Ti.Platform.osname);
 
+/////////////////////////////////////////////////////////////////////////////////////
+//make a view Container to draw UI
+//There are 3 parts on the view(viewTop_radar,viewBottom_Status,viewBottom_Speed)
+/////////////////////////////////////////////////////////////////////////////////////
 var viewContainer = Titanium.UI.createView({
 	left:0,
 	top:0,
@@ -27,6 +31,11 @@ var labelRadar = Titanium.UI.createLabel({
 
 Ti.API.info('in width height'+win_height+','+win_width);
 */
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//There are 3 parts on top(btnReport,imv_satelite,btnMap)
+/////////////////////////////////////////////////////////////////////////////////////
 var viewTop_radar = Titanium.UI.createView({
 	left:0,
 	top:0,
@@ -72,6 +81,9 @@ viewTop_radar.add(imv_satelite);
 viewTop_radar.add(btnMap);
 
 
+/////////////////////////////////////////////////////////////////////////////////////
+//view of satus
+/////////////////////////////////////////////////////////////////////////////////////
 var viewBottom_Status = Titanium.UI.createView({
 	left:0,
 	top:viewTop_radar.top+viewTop_radar.height,
@@ -89,13 +101,18 @@ var labelStatus = Titanium.UI.createLabel({
 	height:viewBottom_Status.height,
 	color:'#fff',
 	text:'Working',
-	font:{fontSize:35,fontFamily:'Helvetica Neue'},
+	//font:{fontSize:35,fontFamily:'Helvetica Neue'},
+	font:{fontSize:15,fontFamily:'Helvetica Neue'},
 	textAlign:'center'
 });
 
 viewBottom_Status.add(labelStatus);
 
 //,borderColor:'#fff'
+
+/////////////////////////////////////////////////////////////////////////////////////
+//view of Speed and distance information
+/////////////////////////////////////////////////////////////////////////////////////
 var viewBottom_Speed = Titanium.UI.createView({
 	left:0,
 	top:viewBottom_Status.top+viewBottom_Status.height,
@@ -106,7 +123,7 @@ var viewBottom_Speed = Titanium.UI.createView({
 
 var dif_compass_left=(Ti.Platform.osname!='android')?0:10;
 var dif_compass_top=(Ti.Platform.osname!='android')?0:2;
-Ti.API.info('the os '+Ti.Platform.osname+' and (left,top)=('+dif_compass_left+','+dif_compass_top+')');
+//Ti.API.info('the os '+Ti.Platform.osname+' and (left,top)=('+dif_compass_left+','+dif_compass_top+')');
 
 var view_compass = Titanium.UI.createView({
 	left:0,
@@ -151,4 +168,5 @@ viewBottom_Speed.add(view_speed);
 viewContainer.add(viewTop_radar);
 viewContainer.add(viewBottom_Status);
 viewContainer.add(viewBottom_Speed);
+
 tabwin_radar.add(viewContainer);
