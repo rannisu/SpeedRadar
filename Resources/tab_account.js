@@ -1,5 +1,5 @@
 
-var tabwin_account = Titanium.UI.createWindow({  
+var tabview_account = Titanium.UI.createView({  
     title:'Account window',
     backgroundImage:'images/background.png'
 });
@@ -13,4 +13,4 @@ var labelAccount = Titanium.UI.createLabel({
 	width:'auto'
 });
 
-tabwin_account.add(labelAccount);
+tabview_account.add(labelAccount);

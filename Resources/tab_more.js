@@ -1,38 +1,123 @@
 Titanium.include('tab_setting.js'); // Creates a 'tab_setting' view we manipulate in the main app
 Titanium.include('tab_account.js'); // Creates a 'tab_account' view we manipulate in the main app
 
+var btnTabHeight=0.22;
+var navigationBarHeight=40;
+var statusBarHeight=20;
 
+var win_width=Titanium.Platform.displayCaps.platformWidth;
+var win_height=Titanium.Platform.displayCaps.platformHeight-statusBarHeight;
+
+if (Ti.Platform.osname != 'android') {
+	win_height = win_height - navigationBarHeight;
+	//Ti.API.info(navigationBarHeight);
+}/*else{
+	win_height = win_height - statusBarHeight;
+}*/
 
 /////////////////////////////////////////////////////////////////////////////////////
 //Radar's more window
 /////////////////////////////////////////////////////////////////////////////////////
 var tab_morewindow = Ti.UI.createWindow({
-  backgroundImage:'images/background.png'
+  backgroundImage:'images/background.png',
+  navBarHidden:true
 });
 
-// create tab group
-var tabGroup = Titanium.UI.createTabGroup();
+if(Ti.Platform.osname != 'android'){
+	tab_morewindow.navBarHidden=false;
+} 
+
+//////
+//switch tab{setting,account} implement
+////
+tabview_setting.width=win_width;
+tabview_setting.height=win_height*(1-btnTabHeight);
+tabview_account.width=win_width;
+tabview_account.height=win_height*(1-btnTabHeight);
+
+tabview_setting.visible = true;
+tabview_account.visible = false;
+
+tab_morewindow.add(tabview_setting);
+tab_morewindow.add(tabview_account);
 
 
-//
-// create base UI tab and root window
-//
-//tab1:setting
-var tabSetting = Titanium.UI.createTab({  
-    icon:'KS_nav_views.png',
-    title:'Setting',
-    window:tabwin_setting
+/////////////////////////////////////////////////////////////////////////////////////
+//create the {setting,account} view
+/////////////////////////////////////////////////////////////////////////////////////
+var tab_SA = Titanium.UI.createView({
+	top:tabview_setting.height,
+  	width:win_width,
+  	height:win_height*btnTabHeight
 });
-//tab2:account
-var tabAccount = Titanium.UI.createTab({  
-    icon:'KS_nav_ui.png',
-    title:'Account',
-    window:tabwin_account
+
+var btnSetting = Titanium.UI.createButton({
+	color:'#00f',
+	/*
+    backgroundImage:'images/reportButton.png',
+	backgroundSelectedImage:'images/reportButton_pressed.png',*/
+	
+	left:0,
+    top:0,
+	width:tab_SA.width*(1/2),
+    height:tab_SA.height,
+	font:{fontSize:18,fontWeight:'bold',fontFamily:'Helvetica Neue'},
+	title:'Setting'
 });
 
-//
-//  add tabs
-// 
-tabGroup.addTab(tabSetting);  
-tabGroup.addTab(tabAccount); 
+var btnAccount = Titanium.UI.createButton({
+	color:'#00f',
+	/*
+    backgroundImage:'images/mapButton.png',
+	backgroundSelectedImage:'images/mapButton_pressed.png',*/
+	
+	left:btnSetting.left+btnSetting.width,
+    top:0,
+	width:tab_SA.width*(1/2),
+    height:tab_SA.height,
+	font:{fontSize:18,fontWeight:'bold',fontFamily:'Helvetica Neue'},
+	title:'Account'
+	//title:'Parse_getTrap'
+});
+/*
+var btnMore = Titanium.UI.createButton({
+	color:'#00f',
+    backgroundImage:'images/reportButton.png',
+	backgroundSelectedImage:'images/reportButton_pressed.png',
+	left:btnRadar.left+btnRadar.width,
+    top:0,
+	width:tab_RRM.width*(1/3),
+    height:tab_RRM.width*(1/3),
+	font:{fontSize:14,fontWeight:'bold',fontFamily:'Helvetica Neue'},
+	title:'More'
+});*/
 
+tab_SA.add(btnSetting);
+tab_SA.add(btnAccount);
+//tab_RRM.add(btnMore);
+
+tab_morewindow.add(tab_SA);
+
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////
+//event handler
+/////////////////////////////////////////////////////////////////////////////////////
+
+btnSetting.addEventListener('click',function(e){
+	tabview_setting.visible = true;
+	tabview_account.visible = false;
+	//Titanium.UI.createAlertDialog({title:'Report ', message:'success'}).show();
+});
+btnAccount.addEventListener('click',function(e){
+	tabview_setting.visible = false;
+	tabview_account.visible = true;
+	//tab_radarview.open();
+	//app.open();
+});
+/*
+btnMore.addEventListener('click',function(e){
+	Titanium.UI.createAlertDialog({title:'Here put ', message:'setting,account view...'}).show();
+});
+*/

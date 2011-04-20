@@ -1,7 +1,7 @@
 
 Titanium.include('setting_code/setting_subview.js');
 
-var tabwin_setting = Titanium.UI.createWindow({  
+var tabview_setting = Titanium.UI.createScrollView({  
     title:'Setting window',
     backgroundImage:'images/background.png'
 });
@@ -16,7 +16,7 @@ var labelSetting = Titanium.UI.createLabel({
 
 var firstWarn_setting=new setting_subview_model('1','600');
 firstWarn_setting.setting_viewContainer.top=0;
-tabwin_setting.add(firstWarn_setting.setting_viewContainer);
+tabview_setting.add(firstWarn_setting.setting_viewContainer);
 /*
 var view_line =Titanium.UI.createView({
 	top:firstWarn_setting.setting_viewContainer.height+20,
@@ -25,10 +25,15 @@ var view_line =Titanium.UI.createView({
 	height:5,
 	backgroundColor:'#fff'
 });
-tabwin_setting.add(view_line);
+tabview_setting.add(view_line);
 */
 var secondWarn_setting=new setting_subview_model('2','100');
 secondWarn_setting.setting_viewContainer.top=firstWarn_setting.setting_viewContainer.height+20;
-tabwin_setting.add(secondWarn_setting.setting_viewContainer);
+tabview_setting.add(secondWarn_setting.setting_viewContainer);
 
+/*
+var eWarn_setting=new setting_subview_model('3','30');
+eWarn_setting.setting_viewContainer.top=secondWarn_setting.setting_viewContainer.top+secondWarn_setting.setting_viewContainer.height+20;
+tabview_setting.add(eWarn_setting.setting_viewContainer);
+*/
 //tabwin_setting.add(labelSetting);
