@@ -20,33 +20,35 @@ if (Ti.Platform.osname != 'android') {
 /////////////////////////////////////////////////////////////////////////////////////
 var tab_morewindow = Ti.UI.createWindow({
   backgroundImage:'images/background.png',
-  navBarHidden:true
+  navBarHidden:true,fullscreen:true
 });
 
 if(Ti.Platform.osname != 'android'){
 	tab_morewindow.navBarHidden=false;
 } 
+var tabContainer = Titanium.UI.createView({
+	top:0,
+  	width:win_width,
+  	height:win_height*(1-btnTabHeight)
+});
 
-//////
+/////////////////////////////////////////////////////////////////////////////////////
 //switch tab{setting,account} implement
-////
-tabview_setting.width=win_width;
-tabview_setting.height=win_height*(1-btnTabHeight);
-tabview_account.width=win_width;
-tabview_account.height=win_height*(1-btnTabHeight);
+/////////////////////////////////////////////////////////////////////////////////////
 
 tabview_setting.visible = true;
 tabview_account.visible = false;
 
-tab_morewindow.add(tabview_setting);
-tab_morewindow.add(tabview_account);
+tabContainer.add(tabview_setting);
+tabContainer.add(tabview_account);
+tab_morewindow.add(tabContainer);
 
 
 /////////////////////////////////////////////////////////////////////////////////////
 //create the {setting,account} view
 /////////////////////////////////////////////////////////////////////////////////////
 var tab_SA = Titanium.UI.createView({
-	top:tabview_setting.height,
+	top:tabContainer.height,
   	width:win_width,
   	height:win_height*btnTabHeight
 });

@@ -75,8 +75,8 @@ var tab_radarview = Titanium.UI.createWindow({
 	width:win_width,
 	height:win_height,
 	backgroundColor:'#fff',
-	title:'Radar view',
-	navBarHidden:true
+	title:'Radar view'
+	//,navBarHidden:true,fullscreen:false
 });
 
 tab_radarview.addEventListener('open',function(e){
@@ -174,7 +174,7 @@ function parseXMLdata(xmlData){
 	var index,subindex;
 	//Ti.API.info(xmlData.indexOf("<SR_baseurl>")+"     "+xmlData.indexOf("</SR_baseurl>"));
 	if((index=xmlData.indexOf("<SR_baseurl>"))>0){
-		Ti.API.info('getting SR_baseurl   '+index+'   '+xmlData.indexOf("</SR_baseurl>"));
+		//Ti.API.info('getting SR_baseurl   '+index+'   '+xmlData.indexOf("</SR_baseurl>"));
 		var subxml;
 		if((subindex=xmlData.indexOf("registerNotification"))>0){
 			subxml = xmlData.substring(subindex,xmlData.length);
@@ -204,7 +204,7 @@ function parseXMLdata(xmlData){
 		Ti.API.info('the ugc:   '+ugcURLStr);
 		*/
 	}else if((index=xmlData.indexOf("<cameras>")+"<cameras>".length)>0){
-		Ti.API.info('getting cameras   '+index+'   '+xmlData.indexOf("</cameras>"));
+		//Ti.API.info('getting cameras   '+index+'   '+xmlData.indexOf("</cameras>"));
 		
 		var substrProcess=xmlData.substring(index,xmlData.indexOf("</cameras>"));
 		//Ti.API.info(substrProcess+"   "+index);
@@ -265,6 +265,13 @@ function downloadBaseUrl(){
 				tracksURLStr = baseURLStr+'/Tracks';
 				ugcURLStr = baseURLStr+'/ugc';
 			}
+			
+			
+			//event to notify others that downloading success.
+			account_signupContainer.memberURLStr=memberURLStr;
+			Titanium.App.fireEvent("GetBaseurlEvent", {
+				    message: 'success'
+			});
 		}catch(exception) {
 		    Ti.API.info(exception);
 		}
@@ -331,7 +338,7 @@ function getTraps(){
 		HttpClientObj.onload = function() {
 			try{
 				var results = this.responseText;
-			  	Ti.API.info(results);
+			  	//Ti.API.info(results);
 				parseXMLdata(results);
 				//labelStatus.text=baseUrl+'/'+latitude+'/'+longitude+'/'+udidUser;
 				/*
@@ -407,6 +414,7 @@ btnMap.addEventListener('click',function(e){
 			radarview_container.visible = true;
 			
 			btnMap.title='Map';
+			tab_radarview.title='Radar view';
 		}else{
 			//btnMap.backgroundImage='images/mapButton_pressed.png';
 			
@@ -414,6 +422,7 @@ btnMap.addEventListener('click',function(e){
 			radarview_container.visible = false;
 			
 			btnMap.title='Radar';
+			tab_radarview.title='Map view';
 		}
 		
 	}
