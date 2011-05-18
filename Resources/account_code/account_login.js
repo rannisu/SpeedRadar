@@ -1,6 +1,7 @@
 var win_width=Titanium.Platform.displayCaps.platformWidth;
-var gettingBaseUrlFinish=false,downloadSuccessful='unsuccess';
+var gettingBaseUrlFinish=false,downloadSuccessful='success';
 var loginURL='/user/login';
+var numCnt =0;
 
 var account_loginContainer = Titanium.UI.createView({
 	top:0,
@@ -64,10 +65,12 @@ function ConnectServerLogin(userinfo){
 				errorReason='Time out!';
 			}
 			
-			Titanium.UI.createAlertDialog({ 
-			  	    title:'login',
-			  	    message: msg2show+' \n\n '+this.status+' \n\n '+errorReason
-			  	  }).show() ;
+			if (++numCnt == 1) {
+				Titanium.UI.createAlertDialog({
+					title: 'login',
+					message: msg2show + ' \n\n ' + this.status + ' \n\n ' + errorReason
+				}).show();
+			}
 		}catch(exception) {
 		    Ti.API.info(exception);
 		}
@@ -77,7 +80,24 @@ function ConnectServerLogin(userinfo){
 	if (Titanium.Platform.osname != 'android') {
 		HttpClientObj.setRequestHeader("Content-Length", userinfo.length);
 	}
-	HttpClientObj.send(userinfo);
+	//HttpClientObj.send(userinfo);
+	if (Titanium.Platform.osname == 'android') {
+		HttpClientObj.send({
+			"username": "ran123@gmail.com",
+			"password": "sr123",
+			"language": "en",
+			"udid":"5BF6E101-3CDE-5882-8947-38E1E8B9BFB4",
+			"app": "speedradar"
+		});
+	}else{
+		HttpClientObj.send({
+			"username": "rannisu@wildmindcorp.com",
+			"password": "speedradar123",
+			"language": "en",
+			"udid":"5BF6E101-3CDE-5882-8947-38E1E8B9BFB4",
+			"app": "speedradar"
+		});
+	}
 }
 
 
@@ -89,25 +109,27 @@ function ConnectServerLogin(userinfo){
 /////////////////////////////////////////////////////////////////////////////////////
 Titanium.App.addEventListener('GetBaseurlEvent',function(e){
 	gettingBaseUrlFinish=true;
-	downloadSuccessful=e.message;
+	//downloadSuccessful=e.message;
+	if (loginURL == '/user/login') {
+		loginURL = e.message + loginURL;
+	}
 });
 
 loginButton.addEventListener('click',function(e){
 	//Ti.API.info('downloadURL '+downloadSuccessful);
 	if(gettingBaseUrlFinish){
 		if(loginURL=='/user/login'){
-			loginURL=account_signupContainer.memberURLStr+loginURL;
+			//loginURL=account_loginContainer.memberURLStr+loginURL;
 			Ti.API.info('see '+loginURL);
-		
-			
-			var userInfo='username=rannisu@wildmindcorp.com&password=speedradar123&app=speedradar&udid=5BF6E101-3CDE-5882-8947-38E1E8B9BFB4&language=en';
-			if(Titanium.Platform.osname == 'android'){
-				userInfo='username=ran123@gmail.com&password=sr123&app=speedradar&udid=android&language=en';
-			} 
-			
-			//log in process
-			ConnectServerLogin(userInfo);
 		}
+		var userInfo='username=rannisu@wildmindcorp.com&password=speedradar123&app=speedradar&udid=5BF6E101-3CDE-5882-8947-38E1E8B9BFB4&language=en';
+		if(Titanium.Platform.osname == 'android'){
+			userInfo='username=ran123@gmail.com&password=sr123&app=speedradar&udid=android&language=en';
+		} 
+			
+		//log in process
+		ConnectServerLogin(userInfo);
+		
 		baseurlLabel.text='';
 		/*
 		Ti.API.info('========================================================');
@@ -124,6 +146,9 @@ loginButton.addEventListener('click',function(e){
 
 
 Titanium.App.addEventListener('LogInEvent',function(e){
+	baseurlLabel.text='Login success';
+	account_loginContainer.remove(loginButton);
+	
 	//log in process
 	ConnectServerLogin(e.message);
 });

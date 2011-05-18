@@ -6,6 +6,11 @@ Titanium.include('tab_radar.js'); // Creates a 'tab_radar' view we manipulate in
 Titanium.include('mapview.js');
 Titanium.include('tab_more.js');
 
+Titanium.include('ugc_code/ugc_report/userReport.js');
+Titanium.include('db_code/fetchDatabase_traps.js');
+//Titanium.include('db_code/fetchDatabase_UGC.js');
+
+
 //Create main app window
 /*
 var app = Titanium.UI.createWindow({
@@ -59,6 +64,12 @@ var speed;
 var timestamp;
 var altitudeAccuracy;
 
+/////////each column match with the column of svr_col_str_sr_cameras(in fetchDatabase_traps.js)
+var response_data_str_sr_cameras=['id','name','latitude','longitude','type','angle','speed','source','country','update_time','reporter','info_completement','salutes','ignores','valid_time'];
+//var response_data_value_sr_cameras=new Array(response_data_str_sr_cameras.length);
+var response_data_value_sr_cameras=new Array(0);
+
+
 //var parseResult=new Array(0);
 var navigationBarHeight;
 
@@ -74,19 +85,9 @@ var navigationBarHeight;
 var tab_radarview = Titanium.UI.createWindow({
 	width:win_width,
 	height:win_height,
-	backgroundColor:'#fff',
+	backgroundColor:'#FFB55A',
 	title:'Radar view'
 	//,navBarHidden:true,fullscreen:false
-});
-
-tab_radarview.addEventListener('open',function(e){
-	if(!catchDataFinish){
-		//資料只抓一次
-		downloadBaseUrl();
-		getTraps();
-		
-		catchDataFinish=true;
-	}
 });
 /*
 tab_radarview.addEventListener('close',function(e){
@@ -104,47 +105,53 @@ if(Ti.Platform.osname != 'android'){
 //create the {report,map,more} view
 /////////////////////////////////////////////////////////////////////////////////////
 var radar_RMM = Titanium.UI.createView({
+	backgroundImage:'images/background/tab_button_bg.png',
 	top:radar_SSI.top+radar_SSI.height,
   	width:win_width,
-  	height:win_height*(0.22)
+  	height:win_height*(0.2)
 });
 
 var btnReport = Titanium.UI.createButton({
 	color:'#00f',
+	//backgroundColor:'#fff',
     backgroundImage:'images/reportButton.png',
 	backgroundSelectedImage:'images/reportButton_pressed.png',
 	left:0,
     top:0,
 	width:radar_RMM.width*(1/3),
-    height:radar_RMM.height,
-	font:{fontSize:14,fontWeight:'bold',fontFamily:'Helvetica Neue'},
-	title:'Report'
+    height:radar_RMM.height
+	//,font:{fontSize:14,fontWeight:'bold',fontFamily:'Helvetica Neue'}
+	//,title:'Report'
 });
 
 var btnMap = Titanium.UI.createButton({
 	color:'#00f',
+	//backgroundColor:'#f0f',
 	backgroundImage:'images/mapButton.png',
 	backgroundSelectedImage:'images/mapButton_pressed.png',
 	left:btnReport.left+btnReport.width,
+	//left:radar_RMM.width*(1/3),
     top:0,
-	width:radar_RMM.width*(1/3),
-    height:radar_RMM.height,
-	font:{fontSize:14,fontWeight:'bold',fontFamily:'Helvetica Neue'},
-	title:'Map'
+	width:radar_RMM.width*(1/3)+5,
+    height:radar_RMM.height
+	//,font:{fontSize:14,fontWeight:'bold',fontFamily:'Helvetica Neue'}
+	//,title:'Map'
 	//title:'Parse_getTrap'
 });
 
 var btnMore = Titanium.UI.createButton({
 	color:'#00f',
+	//backgroundColor:'#fff',
     //image:'images/reportButton.png',
-	backgroundImage:'images/reportButton.png',
-	backgroundSelectedImage:'images/reportButton_pressed.png',
+	backgroundImage:'images/moreButton.png',
+	backgroundSelectedImage:'images/moreButton_pressed.png',
 	left:btnMap.left+btnMap.width,
+	//left:radar_RMM.width*(2/3),
     top:0,
 	width:radar_RMM.width*(1/3),
-    height:radar_RMM.height,
-	font:{fontSize:14,fontWeight:'bold',fontFamily:'Helvetica Neue'},
-	title:'More'
+    height:radar_RMM.height
+	//,font:{fontSize:14,fontWeight:'bold',fontFamily:'Helvetica Neue'}
+	//,title:'More'
 });
 
 radar_RMM.add(btnReport);
@@ -170,72 +177,116 @@ tab_radarview.add(radar_RMM);
 //function
 /////////////////////////////////////////////////////////////////////////////////////
 
+function parseRowData_sr_cameras(dataIndex,row_data){
+	/////parse row data:,   than will access db in one time(per all_data)
+	for(i=0;i<response_data_str_sr_cameras.length;i++){
+		//var strShow=response_data_str_sr_cameras[i];
+		var searchStr=' '+response_data_str_sr_cameras[i]+'=\"';
+		var indexColStr=row_data.indexOf(searchStr)+searchStr.length;
+		
+		response_data_value_sr_cameras[dataIndex][i]=row_data.substring(indexColStr,row_data.indexOf("\"",indexColStr));
+		//strShow=strShow+'   :  '+row_data.substring(indexColStr,row_data.indexOf("\"",indexColStr));
+		
+		//Ti.API.info('ooo  '+response_data_str_sr_cameras[i]+'  : '+response_data_value_sr_cameras[dataIndex][i]);
+	}
+}
+
+
 function parseXMLdata(xmlData){
 	var index,subindex;
 	//Ti.API.info(xmlData.indexOf("<SR_baseurl>")+"     "+xmlData.indexOf("</SR_baseurl>"));
 	if((index=xmlData.indexOf("<SR_baseurl>"))>0){
 		//Ti.API.info('getting SR_baseurl   '+index+'   '+xmlData.indexOf("</SR_baseurl>"));
 		var subxml;
-		if((subindex=xmlData.indexOf("registerNotification"))>0){
+		if((subindex=xmlData.indexOf("key=\"registerNotification\""))>0){
 			subxml = xmlData.substring(subindex,xmlData.length);
 			notificationURLStr=subxml.substring(subxml.indexOf("http://"),subxml.indexOf("\"/>"));
 		}
-		if((subindex=xmlData.indexOf("base"))>0){
+		if((subindex=xmlData.indexOf("key=\"base\""))>0){
 			subxml = xmlData.substring(subindex,xmlData.length);
 			baseURLStr=subxml.substring(subxml.indexOf("http://"),subxml.indexOf("\"/>"));
 		}
-		if((subindex=xmlData.indexOf("baseMember"))>0){
+		if((subindex=xmlData.indexOf("key=\"baseMember\""))>0){
 			subxml = xmlData.substring(subindex,xmlData.length);
 			memberURLStr=subxml.substring(subxml.indexOf("http://"),subxml.indexOf("\"/>"));
 		}
-		if((subindex=xmlData.indexOf("reachGoal"))>0){
+		if((subindex=xmlData.indexOf("key=\"reachGoal\""))>0){
 			subxml = xmlData.substring(subindex,xmlData.length);
 			reachGoalUrlStr=subxml.substring(subxml.indexOf("http://"),subxml.indexOf("\"/>"));
 		}
 		tracksURLStr=baseURLStr+'/Tracks';
 		ugcURLStr=baseURLStr+'/ugc';
 		
-		/*
+		
 		Ti.API.info('the notification:   '+notificationURLStr);
 		Ti.API.info('the base:   '+baseURLStr);
 		Ti.API.info('the baseMember:   '+memberURLStr);
 		Ti.API.info('the reachGoal:   '+reachGoalUrlStr);
 		Ti.API.info('the track:   '+tracksURLStr);
 		Ti.API.info('the ugc:   '+ugcURLStr);
-		*/
+		
 	}else if((index=xmlData.indexOf("<cameras>")+"<cameras>".length)>0){
 		//Ti.API.info('getting cameras   '+index+'   '+xmlData.indexOf("</cameras>"));
 		
 		var substrProcess=xmlData.substring(index,xmlData.indexOf("</cameras>"));
 		//Ti.API.info(substrProcess+"   "+index);
 		
+		
 		var cnt=0;
 		while(substrProcess.length>0){
+			
+			//1.init response_data_value_sr_cameras per camera_trap
+			//2.parse each column in row data(id,name,latitude....)
+			//3.then check which reporter it is, and write the xxxReporter as format (latitude,longitude)
+			response_data_value_sr_cameras[response_data_value_sr_cameras.length]=new Array(response_data_str_sr_cameras.length);
+			parseRowData_sr_cameras(response_data_value_sr_cameras.length-1,substrProcess.substring(0,substrProcess.indexOf("/>")+2));
+			
 			//substrProcess=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
 			//Ti.API.info(substrProcess.substring(0,substrProcess.indexOf("/>")+2));
 			//parseResult=parseResult+'\n'+substrProcess.substring(0,substrProcess.indexOf("/>")+2);
 			//parseResult[parseResult.length]=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
+			
+			/*
 			var tmp2check=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
 			var indexReporter = tmp2check.indexOf("reporter=")+10;
 			var reporterEmail = tmp2check.substring(indexReporter,tmp2check.indexOf("\" ",indexReporter));
+			*/
+			//var reporterEmailIndex = Array.indexOf(response_data_str_sr_cameras,'reporter',0)
+			var reporterEmail = response_data_value_sr_cameras[response_data_value_sr_cameras.length-1][response_data_str_sr_cameras.indexOf('reporter')];
+			var indexLat=response_data_str_sr_cameras.indexOf('latitude');
+			var indexLon=response_data_str_sr_cameras.indexOf('longitude');
 			
 			if(reporterEmail=="WildmindCorp"){//wildmind
-				wildmindRepoter[wildmindRepoter.length]=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
+				wildmindReporter[wildmindReporter.length]='('+response_data_value_sr_cameras[response_data_value_sr_cameras.length-1][indexLat]+','+response_data_value_sr_cameras[response_data_value_sr_cameras.length-1][indexLon]+')';
+				//wildmindReporter[wildmindReporter.length]=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
 			}else if(reporterEmail==userEmail){//user self
-				myRepoter[myRepoter.length]=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
+				myReporter[myReporter.length]='('+response_data_value_sr_cameras[response_data_value_sr_cameras.length-1][indexLat]+','+response_data_value_sr_cameras[response_data_value_sr_cameras.length-1][indexLon]+')';
+				//myReporter[myReporter.length]=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
 			}else{//others
-				otherRepoter[otherRepoter.length]=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
+				otherReporter[otherReporter.length]='('+response_data_value_sr_cameras[response_data_value_sr_cameras.length-1][indexLat]+','+response_data_value_sr_cameras[response_data_value_sr_cameras.length-1][indexLon]+')';
+				//otherReporter[otherReporter.length]=substrProcess.substring(0,substrProcess.indexOf("/>")+2);
 			}
+			//Ti.API.info('======================='+reporterEmail);
+			
 			
 			substrProcess=substrProcess.substring(substrProcess.indexOf("/>")+2,substrProcess.length);
 			//index=index+substrProcess.indexOf("/>")+2;
 			//cnt++;
 		}
 		
+		
 		////////////////////////////////////////////////////////
-		/////////////////////設定map的data annotation///////////////////////////////////
+		/////////////////////DB(fetchDatabase_traps.js)   one access/////////////////////
+		//initDB_sr_cameras_rowData('svrstr',substrProcess.substring(0,substrProcess.indexOf("/>")+2));
+		insertDB_sr_cameras(response_data_value_sr_cameras);
+		/////////////////////DB(fetchDatabase_traps.js)/////////////////////
+		////////////////////////////////////////////////////////
+		
+		
+		////////////////////////////////////////////////////////
+		/////////////////////設定map的data annotation(mapview.js)///////////////////////////////////
 		settingMapData();
-		////////////////////////////////////////////////////////
+		/////////////////////設定map的data annotation(mapview.js)///////////////////////////////////
 		////////////////////////////////////////////////////////
 		
 		
@@ -268,9 +319,12 @@ function downloadBaseUrl(){
 			
 			
 			//event to notify others that downloading success.
+			/*
 			account_signupContainer.memberURLStr=memberURLStr;
+			account_loginContainer.memberURLStr=memberURLStr;
+			*/
 			Titanium.App.fireEvent("GetBaseurlEvent", {
-				    message: 'success'
+				    message: memberURLStr
 			});
 		}catch(exception) {
 		    Ti.API.info(exception);
@@ -295,6 +349,7 @@ function getTraps(){
 	// Titanium.Geolocation.ACCURACY_THREE_KILOMETERS
 	//
 	Titanium.Geolocation.accuracy = Titanium.Geolocation.ACCURACY_BEST;
+	Titanium.Geolocation.preferredProvider = Titanium.Geolocation.PROVIDER_NETWORK;//PROVIDER_GPS
 
 	//
 	//  SET DISTANCE FILTER.  THIS DICTATES HOW OFTEN AN EVENT FIRES BASED ON THE DISTANCE THE DEVICE MOVES
@@ -338,7 +393,7 @@ function getTraps(){
 		HttpClientObj.onload = function() {
 			try{
 				var results = this.responseText;
-			  	//Ti.API.info(results);
+			  	Ti.API.info(results);
 				parseXMLdata(results);
 				//labelStatus.text=baseUrl+'/'+latitude+'/'+longitude+'/'+udidUser;
 				/*
@@ -380,7 +435,26 @@ function refreshUI(){
 	
 }
 
+
+tab_radarview.addEventListener('open',function(e){
+	if(!catchDataFinish){
+		//資料只抓一次
+		downloadBaseUrl();
+		getTraps();
+		
+		catchDataFinish=true;
+	}
+});
 btnReport.addEventListener('click',function(e){
+	//username,latitude,longitude,direction,accuracy,cameraType,st_name,country
+	
+	//var user_repostObj = new userReport_trap(baseURLStr,'username=ran123@gmail.com&latitude=25.380349&longitude=121.565109&direction=6&accuracy=100&cam_type=1&st_name=ran&country=tw');
+	//Ti.API.info(user_repostObj.report_returnData);
+	//var user_repostObj =userReport_trap(baseURLStr,'username=ran123@gmail.com&latitude=25.380349&longitude=121.565109&direction=6&accuracy=100&cam_type=1&st_name=ran&country=tw');
+	//Ti.API.info(user_repostObj);
+	userReport_trap(ugcURLStr,'username=ran123@gmail.com&latitude=25.080429&longitude=121.565835&direction=1&accuracy=100&cam_type=1&st_name=ran&language=en');
+	
+	/*
 	if(radar_status_bottom_notification.visible){
 		radar_status_bottom_container.height=radar_status_bottom_container.height*(40/25);
 		radar_status_bottom_notification.top=radar_status_bottom_container.top+radar_status_bottom_container.height;
@@ -398,7 +472,7 @@ btnReport.addEventListener('click',function(e){
 		
 		btnReport.backgroundImage='images/reportButton_pressed.png';
 		radar_status_bottom_notification.visible=true;
-	}
+	}*/
 	
 });
 btnMap.addEventListener('click',function(e){

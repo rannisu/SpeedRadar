@@ -16,9 +16,9 @@ if (Ti.Platform.osname != 'android') {
 var currentLatitude;
 var currentLongitude;
 
-var wildmindRepoter=new Array(0);
-var otherRepoter=new Array(0);
-var myRepoter=new Array(0);
+var wildmindReporter=new Array(0);
+var otherReporter=new Array(0);
+var myReporter=new Array(0);
 
 var mapAnnotation=new Array(0);
 var wildmindAnnotation=new Array(0);
@@ -46,12 +46,16 @@ var label = Titanium.UI.createLabel({
 
 function settingMapData(){
 	
-	//Ti.API.info(wildmindRepoter.length+'   wildmind');
-	for(i=0;i<wildmindRepoter.length;i++){
-		var indexLat=wildmindRepoter[i].indexOf("latitude")+10;
-		var latitudeW=wildmindRepoter[i].substring(indexLat,wildmindRepoter[i].indexOf("\" ",indexLat));
-		var indexLong=wildmindRepoter[i].indexOf("longitude")+11;
-		var longitudeW=wildmindRepoter[i].substring(indexLong,wildmindRepoter[i].indexOf("\" ",indexLong));
+	//Ti.API.info(wildmindReporter.length+'   wildmind');
+	for(i=0;i<wildmindReporter.length;i++){
+		/*
+		var indexLat=wildmindReporter[i].indexOf("latitude")+10;
+		var latitudeW=wildmindReporter[i].substring(indexLat,wildmindReporter[i].indexOf("\" ",indexLat));
+		var indexLong=wildmindReporter[i].indexOf("longitude")+11;
+		var longitudeW=wildmindReporter[i].substring(indexLong,wildmindReporter[i].indexOf("\" ",indexLong));
+		*/
+		var latitudeW=wildmindReporter[i].substring(wildmindReporter[i].indexOf("(")+1,wildmindReporter[i].indexOf(","));
+		var longitudeW=wildmindReporter[i].substring(wildmindReporter[i].indexOf(",")+1,wildmindReporter[i].indexOf(")"));
 		
 		mapAnnotation[mapAnnotation.length]= Titanium.Map.createAnnotation({
 			latitude:latitudeW,
@@ -67,13 +71,17 @@ function settingMapData(){
 	}
 	
 	
-	//Ti.API.info(otherRepoter.length+'   other');
-	for(i=0;i<otherRepoter.length;i++){
-		//Ti.API.info(otherRepoter[i]);
-		indexLat=otherRepoter[i].indexOf("latitude")+10;
-		latitudeW=otherRepoter[i].substring(indexLat,otherRepoter[i].indexOf("\" ",indexLat));
-		indexLong=otherRepoter[i].indexOf("longitude")+11;
-		longitudeW=otherRepoter[i].substring(indexLong,otherRepoter[i].indexOf("\" ",indexLong));
+	//Ti.API.info(otherReporter.length+'   other');
+	for(i=0;i<otherReporter.length;i++){
+		//Ti.API.info(otherReporter[i]);
+		/*
+		indexLat=otherReporter[i].indexOf("latitude")+10;
+		latitudeW=otherReporter[i].substring(indexLat,otherReporter[i].indexOf("\" ",indexLat));
+		indexLong=otherReporter[i].indexOf("longitude")+11;
+		longitudeW=otherReporter[i].substring(indexLong,otherReporter[i].indexOf("\" ",indexLong));
+		*/
+		latitudeW=otherReporter[i].substring(otherReporter[i].indexOf("(")+1,otherReporter[i].indexOf(","));
+		longitudeW=otherReporter[i].substring(otherReporter[i].indexOf(",")+1,otherReporter[i].indexOf(")"));
 		
 		mapAnnotation[mapAnnotation.length]= Titanium.Map.createAnnotation({
 			latitude:latitudeW,
@@ -89,13 +97,19 @@ function settingMapData(){
 			mapAnnotation[mapAnnotation.length-1].pincolor=Titanium.Map.ANNOTATION_PURPLE;
 		} 
 	}
-	//Ti.API.info(myRepoter.length+'   userOwn');
-	for(i=0;i<myRepoter.length;i++){
-		//Ti.API.info(myRepoter[i]);
-		indexLat=myRepoter[i].indexOf("latitude")+10;
-		latitudeW=myRepoter[i].substring(indexLat,myRepoter[i].indexOf("\" ",indexLat));
-		indexLong=myRepoter[i].indexOf("longitude")+11;
-		longitudeW=myRepoter[i].substring(indexLong,myRepoter[i].indexOf("\" ",indexLong));
+	//Ti.API.info(myReporter.length+'   userOwn');
+	for(i=0;i<myReporter.length;i++){
+		//Ti.API.info(myReporter[i]);
+		/*
+		indexLat=myReporter[i].indexOf("latitude")+10;
+		latitudeW=myReporter[i].substring(indexLat,myReporter[i].indexOf("\" ",indexLat));
+		indexLong=myReporter[i].indexOf("longitude")+11;
+		longitudeW=myReporter[i].substring(indexLong,myReporter[i].indexOf("\" ",indexLong));
+		*/
+		
+		latitudeW=myReporter[i].substring(myReporter[i].indexOf("(")+1,myReporter[i].indexOf(","));
+		longitudeW=myReporter[i].substring(myReporter[i].indexOf(",")+1,myReporter[i].indexOf(")"));
+		Ti.API.info(latitudeW+'     '+longitudeW);
 		
 		mapAnnotation[mapAnnotation.length]= Titanium.Map.createAnnotation({
 			latitude:latitudeW,

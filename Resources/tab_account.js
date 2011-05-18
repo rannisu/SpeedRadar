@@ -101,8 +101,10 @@ Titanium.App.addEventListener('SignUpFinishEvent',function(e){
 	accountContainer.height=account_loginContainer.height;
 	accountContainer.add(account_loginContainer);
 	
+	
 	var passMsg=e.message;
 	Titanium.App.fireEvent("LogInEvent", {
 		message: passMsg
 	});
+	
 });

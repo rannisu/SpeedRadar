@@ -1,7 +1,7 @@
 Titanium.include('tab_setting.js'); // Creates a 'tab_setting' view we manipulate in the main app
 Titanium.include('tab_account.js'); // Creates a 'tab_account' view we manipulate in the main app
 
-var btnTabHeight=0.22;
+var btnTabHeight=0.2;
 var navigationBarHeight=40;
 var statusBarHeight=20;
 
@@ -19,7 +19,6 @@ if (Ti.Platform.osname != 'android') {
 //Radar's more window
 /////////////////////////////////////////////////////////////////////////////////////
 var tab_morewindow = Ti.UI.createWindow({
-  backgroundImage:'images/background.png',
   navBarHidden:true,fullscreen:true
 });
 

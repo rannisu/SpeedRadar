@@ -1,6 +1,6 @@
 var navigationBarHeight=40;
 var statusBarHeight=20;
-var btnTabHeight=0.22;
+var btnTabHeight=0.2;
 
 var win_width=Titanium.Platform.displayCaps.platformWidth;
 var win_height=Titanium.Platform.displayCaps.platformHeight-statusBarHeight;
@@ -17,6 +17,7 @@ var /*labelTextSmallSize=20,*/labelTextLargeSize=28;
 
 
 var radarview_container = Titanium.UI.createView({
+	backgroundImage:'images/background/radarview_bg.png',
 	top:0,
 	left:0,
  	width:win_width,
@@ -30,7 +31,7 @@ var radar_status = Titanium.UI.createView({
 	top:20,
 	left:20,
  	width:radarview_container.width-40,
-  	height:radarview_container.height*(55/88)-40,
+  	height:radarview_container.height*(55/80)-30,
 	backgroundImage:'images/bg.png'
 });
 
@@ -169,11 +170,58 @@ radar_status.add(radar_status_bottom);
 //create the {salute,speed,ignore} view
 /////////////////////////////////////////////////////////////////////////////////////
 var radar_SSI = Titanium.UI.createView({
-	top:win_height*(0.55),
+	top:win_height*(0.55)-10,
   	width:radarview_container.width,
-  	height:radarview_container.height*(23/88),
-  	backgroundColor:'#777777'
+  	height:radarview_container.height*(25/80)+10
 });
+var radar_SSI_btnLikeReport = Titanium.UI.createButton({
+	left:10,
+    backgroundImage:'images/likeReportButton.png',
+	backgroundSelectedImage:'images/likeReportButton_dark.png',
+	width:radar_SSI.width*(1/3),
+    height:(radar_SSI.height-20)*0.8
+});
+var radar_SSI_btnLikeReport_label = Titanium.UI.createLabel({
+	top:radar_SSI_btnLikeReport.height,
+	left:radar_SSI_btnLikeReport.left,
+	color:'#fff',
+	width:radar_SSI_btnLikeReport.width,
+    height:(radar_SSI.height-20)*0.2,
+	font:{fontSize:24,fontWeight:'bold',fontFamily:'Helvetica Neue'},
+	text:'28',
+	textAlign:'center'
+});
+var radar_SSI_notification_label = Titanium.UI.createLabel({
+	left:radar_SSI_btnLikeReport.width,
+	width:radar_SSI.width*(1/3),
+    height:radar_SSI.height-20,
+	color:'#000',
+	text:'90',
+	font:{fontSize:80,fontFamily:'Helvetica Neue'},
+	textAlign:'center'
+});
+var radar_SSI_btnHateReport = Titanium.UI.createButton({
+	left:radar_SSI_notification_label.left+radar_SSI_notification_label.width,
+    backgroundImage:'images/hateReportButton.png',
+	backgroundSelectedImage:'images/hateReportButton_dark.png',
+	width:radar_SSI.width*(1/3),
+    height:(radar_SSI.height-20)*0.8,
+});
+var radar_SSI_btnHateReport_label = Titanium.UI.createLabel({
+	top:radar_SSI_btnHateReport.height,
+	left:radar_SSI_btnHateReport.left,
+	color:'#fff',
+	width:radar_SSI_btnHateReport.width,
+    height:(radar_SSI.height-20)*0.2,
+	font:{fontSize:24,fontWeight:'bold',fontFamily:'Helvetica Neue'},
+	text:'3',
+	textAlign:'center'
+});
+radar_SSI.add(radar_SSI_btnLikeReport);
+radar_SSI.add(radar_SSI_btnLikeReport_label);
+radar_SSI.add(radar_SSI_notification_label);
+radar_SSI.add(radar_SSI_btnHateReport);
+radar_SSI.add(radar_SSI_btnHateReport_label);
 
 radarview_container.add(radar_status);
 radarview_container.add(radar_SSI);

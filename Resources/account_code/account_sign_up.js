@@ -1,7 +1,7 @@
 var win_width=Titanium.Platform.displayCaps.platformWidth;
-var gettingBaseUrlFinish=false,downloadSuccessful='unsuccess';
+var gettingBaseUrlFinish=false,downloadSuccessful='success';
 var signupURL='/user/signup';
-
+//var numCnt =0;
 
 var account_signupContainer = Titanium.UI.createView({
 	top:0,
@@ -76,7 +76,8 @@ function ConnectServerSignUp(){
 					message: userInfo
 				});
 			}else if(this.status == 409){
-				errorReason='Member exist!';
+				errorReason='Username Exist!';
+				Ti.API.info(results);
 				
 				Titanium.App.fireEvent("SignUpFinishEvent", {
 					message: userInfo
@@ -102,17 +103,72 @@ function ConnectServerSignUp(){
 		    Ti.API.info(exception);
 		}
 	};
+	HttpClientObj.onerror=function() {
+		//for android: 
+		//409: this.responseText=='Username Exist'
+		Ti.API.info('error: '+this.responseText);
+	};
+	
 	HttpClientObj.open("POST",signupURL);
 	HttpClientObj.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=utf-8");
 	if (Titanium.Platform.osname != 'android') {
 		HttpClientObj.setRequestHeader("Content-Length", bodyStr.length);
 	}
-	HttpClientObj.send(bodyStr);
+	
+	//HttpClientObj.send(bodyStr);
+	if (Titanium.Platform.osname == 'android') {
+		HttpClientObj.send({
+			"username": "ran123@gmail.com",
+			"password": "sr123",
+			"email": "ran123@gmail.com",
+			"mood": "",
+			"nickname": "test",
+			"language": "en",
+			"app": "speedradar"
+		});
+	}else{
+		HttpClientObj.send({
+			"username": "rannisu@wildmindcorp.com",
+			"password": "speedradar123",
+			"email": "rannisu@wildmindcorp.com",
+			"mood": "",
+			"nickname": "test",
+			"language": "en",
+			"app": "speedradar"
+		});
+	}
 	
 	//HttpClientObj.open("GET",signupURL+'?'+bodyStr);
 	//HttpClientObj.send();
 }
 
+
+/*
+function CheckMemberConflict(){
+	var sqlURL='';
+	
+	HttpClientObj = Titanium.Network.createHTTPClient();
+	HttpClientObj.onload = function() {
+		try{
+			var results = this.responseText;
+			var json = JSON.parse(this.responseText);
+		    if (!json) { 
+		        Titanium.API.info('Error - Null return!'); 
+		        return;
+		    }
+		    var json = json.cats;
+		    var pos;
+		    for( pos=0; pos < jsoncats.length; pos++){
+		        //Ti.API.info(json[pos].cat_name, json[pos].colour_name);
+		    }
+			
+		}catch(exception) {
+		    Ti.API.info(exception);
+		}
+	};
+	HttpClientObj.open("GET",sqlURL);
+	HttpClientObj.send();
+}*/
 
 
 
@@ -122,22 +178,32 @@ function ConnectServerSignUp(){
 /////////////////////////////////////////////////////////////////////////////////////
 Titanium.App.addEventListener('GetBaseurlEvent',function(e){
 	gettingBaseUrlFinish=true;
-	downloadSuccessful=e.message;
+	//downloadSuccessful=e.message;
+	if (signupURL == '/user/signup') {
+		signupURL = e.message + signupURL;
+	}
 });
 
 signupButton.addEventListener('click',function(e){
 	//Ti.API.info('downloadURL '+downloadSuccessful);
 	if(gettingBaseUrlFinish){
+		/*
 		if(signupURL=='/user/signup'){
 			signupURL=account_signupContainer.memberURLStr+signupURL;
 			
-		}
+		}*/
 		baseurlLabel.text='';
 		
 		Ti.API.info('see '+signupURL);
 			
+			
+		//There still has bug(android)...
+		//the "409 member exist" exception was catched by android os,titanium can't catch	
+		//CheckMemberConflict();	
+			
 		//sign up process
 		ConnectServerSignUp();
+		
 		
 		/*
 		Ti.API.info('========================================================');
