@@ -53,7 +53,8 @@ function insertDB_sr_cameras(dataArray){
 	{
 		Ti.API.info('(id\t,location\t,latitude\t,longitude\t,cam_type\t,angle\t,speed\t,source\t,country\t,update_time\t,reporter\t,info_completement\t,salutes\t,ignores\t,valid_time)');
 		var rowShow='';
-		for(i=0;i<rows.fieldCount();i++){
+		var sizeCol=(Ti.Platform.osname != 'android')?rows.fieldCount():rows.fieldCount;
+		for(i=0;i<sizeCol;i++){
 			rowShow=rowShow+' '+rows.field(i);
 		}
 		Ti.API.info('+++++++++++++++   '+rowShow);
